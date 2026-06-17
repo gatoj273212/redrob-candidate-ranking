@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presentation Deck — AI Candidate Ranking Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --primary: #6366f1;
+      --primary-grad: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      --accent: #14b8a6;
+      --accent-grad: linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #0b0f19;
+      color: var(--text-main);
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+    }
+
+    /* Screen Layout */
+    .controls {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      padding: 10px 18px;
+      border-radius: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .btn {
+      background: var(--primary-grad);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: opacity 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background: var(--border);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .presentation-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 80px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+      padding: 0 20px;
+    }
+
+    .slide {
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      padding: 50px 70px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    /* Decorative slide patterns */
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: -10%;
+      right: -10%;
+      width: 40%;
+      height: 60%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding-bottom: 15px;
+      z-index: 2;
+    }
+
+    .slide-header h2 {
+      font-size: 2.2rem;
+      background: var(--primary-grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-header .slide-tag {
+      font-size: 0.85rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      border: 1px solid var(--accent);
+      padding: 3px 10px;
+      border-radius: 6px;
+    }
+
+    .slide-body {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin: 25px 0;
+      z-index: 2;
+    }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 15px;
+      z-index: 2;
+    }
+
+    /* Title Slide Specific */
+    .slide-title-layout {
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .slide-title-layout h1 {
+      font-size: 3.8rem;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff 40%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-title-layout p.subtitle {
+      font-size: 1.4rem;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      max-width: 800px;
+      font-weight: 300;
+    }
+
+    .team-badge {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 10px 24px;
+      border-radius: 50px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .team-badge span.dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    /* Content Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      width: 100%;
+    }
+
+    .content-box {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .content-box h3 {
+      font-size: 1.4rem;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .content-box ul {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .content-box ul li {
+      position: relative;
+      padding-left: 20px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .content-box ul li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .highlight-text {
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+
+    /* Step flow visual */
+    .flow-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .flow-step::after {
+      content: '→';
+      position: absolute;
+      right: -15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .flow-step:last-child::after {
+      display: none;
+    }
+
+    .flow-step h4 {
+      font-size: 1.1rem;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .flow-step p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .flow-step .step-num {
+      width: 28px;
+      height: 28px;
+      background: var(--primary-grad);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 0 auto 12px;
+    }
+
+    /* Metric card group */
+    .metrics-group {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      width: 100%;
+    }
+
+    .metric-card {
+      background: rgba(30, 41, 59, 0.3);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .metric-card .num {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: 'Outfit', sans-serif;
+      margin-bottom: 4px;
+    }
+
+    .metric-card .label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Print Stylesheet (For PDF Export) */
+    @media print {
+      body {
+        background-color: white !important;
+        color: black !important;
+      }
+      .controls {
+        display: none !important;
+      }
+      .presentation-container {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        gap: 0 !important;
+      }
+      .slide {
+        page-break-after: always !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        padding: 40px 60px !important;
+        background-color: #0f172a !important; /* Keep the dark theme look on print to make it visually pop */
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        aspect-ratio: 16 / 9;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen controls -->
+  <div class="controls">
+    <span style="font-size: 0.8rem; color: var(--text-muted);">PDF Deck Creator</span>
+    <button class="btn btn-secondary" onclick="window.print()">Print to PDF / Save</button>
+  </div>
+
+  <div class="presentation-container">
+
+    <!-- Slide 1: Title -->
+    <div class="slide slide-title-layout">
+      <div>
+        <div class="team-badge" style="margin-bottom: 24px;">
+          <span class="dot"></span>
+          <span style="font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Team Blue Samurai</span>
+        </div>
+        <h1>AI CANDIDATE RANKER</h1>
+        <p class="subtitle">Multi-Signal Candidate Screening Engine leveraging Latent Semantic Analysis & Platform Behavioral Indicators</p>
+        <div style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">
+          Redrob AI Hackathon — Track 1: Data & AI Challenge
+        </div>
+      </div>
+      <div class="slide-footer" style="border: none; width: 100%;">
+        <span>June 2026</span>
+        <span>Slide 1 of 6</span>
+      </div>
+    </div>
+
+    <!-- Slide 2: The Strategy & Counter-Keyword Filter -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2>The Core Recruitment Strategy</h2>
+        <span class="slide-tag">Methodology</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="content-box">
+            <h3 style="color: #ef4444;">❌ The Keyword Trap</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
+              The job description specifies a trap built in the dataset: <span class="highlight-text">"The right answer is not 'find candidates whose skills section contains the most AI keywords'."</span>
+            </p>
+            <ul>
+              <li>Candidates stuff resumes with hundreds of unverified skills.</li>
+              <li>Keyword-matching filters miss genuine founding-team engineering talent.</li>
+              <li>A recruiter needs to check experience depth and verify production skills.</li>
+            </ul>
+          </div>
+          <div class="content-box" style="border-color: rgba(20, 184, 166, 0.3);">
+            <h3 style="color: var(--accent);">✔️ Our Multi-Signal Approach</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
+              We rank profiles using a holistic scoring formula consisting of:
+            </p>
+            <ul>
+              <li><span class="highlight-text">Semantic Analysis (40%)</span>: Latent conceptual context from JDs and profiles.</li>
+              <li><span class="highlight-text">Structural Validation (40%)</span>: Experience tenure, titles, skill duration.</li>
+              <li><span class="highlight-text">Behavioral Indicators (20%)</span>: Platform recency, notice periods, and code quality.</li>
+              <li><span class="highlight-text">Honeypot Shield</span>: Heavy penalty filters for suspicious and contradictory profiles.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Team Blue Samurai — AI Candidate Ranker</span>
+        <span>Slide 2 of 6</span>
+      </div>
+    </div>
+
+    <!-- Slide 3: Two-Phase Architecture -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2>Two-Phase Architecture</h2>
+        <span class="slide-tag">Architecture</span>
+      </div>
+      <div class="slide-body" style="flex-direction: column; justify-content: center; gap: 30px;">
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem; max-width: 900px; margin: 0 auto;">
+          The challenge requires processing <span class="highlight-text">100,000 candidates</span> in under 5 minutes on a standard CPU. We resolved this constraint with a high-performance two-phase architecture.
+        </p>
+        <div class="flow-container">
+          <div class="flow-step">
+            <div class="step-num">1</div>
+            <h4>Text Aggregation</h4>
+            <p>Aggregates candidates' summaries, experience, and duration-filtered skills into a narrative document.</p>
+          </div>
+          <div class="flow-step">
+            <div class="step-num">2</div>
+            <h4>Pre-Computation</h4>
+            <p>Applies TF-IDF vectorization (30K features) and Truncated SVD (384 dimensions) to cache candidates' dense vector embeddings.</p>
+          </div>
+          <div class="flow-step">
+            <div class="step-num">3</div>
+            <h4>JD Matching</h4>
+            <p>Computes cosine similarity between the Job Description embedding and the 100K pre-computed candidate vectors (completed in milliseconds).</p>
+          </div>
+          <div class="flow-step">
+            <div class="step-num">4</div>
+            <h4>Signal Fusion</h4>
+            <p>Applies structural constraints, behavioral scores, honeypot filters, and penalties to compile the final top 100 CSV.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Team Blue Samurai — AI Candidate Ranker</span>
+        <span>Slide 3 of 6</span>
+      </div>
+    </div>
+
+    <!-- Slide 4: Signal Fusion & Scoring System -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2>Signal Fusion & Scoring System</h2>
+        <span class="slide-tag">Scoring</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="content-box">
+            <h3>📊 Scoring Weights</h3>
+            <ul>
+              <li><strong>Semantic Score (40%)</strong>: Cosine similarity between JD vector and Candidate LSA vector. Finds conceptual match.</li>
+              <li><strong>Structural Score (40%)</strong>: Title match (Senior, Founding, Lead), experience target (6-8 years ideal), and production-grade skills (e.g. AWS, MLOps, vector databases).</li>
+              <li><strong>Behavioral Score (20%)</strong>: Active Open-to-Work flags, high recruiter response rate, shorter notice periods, and GitHub activity index.</li>
+            </ul>
+          </div>
+          <div class="content-box">
+            <h3>⚠️ Penalties & Hard Filters</h3>
+            <ul>
+              <li><strong>Honeypot Filter (*0.01 multiplier)</strong>: Candidates listing 10+ AI skills but having 0 months of career experience.</li>
+              <li><strong>Consulting Penalty (*0.10 multiplier)</strong>: Outlines candidates who spent their entire careers in service-only IT agencies.</li>
+              <li><strong>Experience/Location Bounds</strong>: Adjusts scores for candidates below 2 years of experience or residing outside the target region.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Team Blue Samurai — AI Candidate Ranker</span>
+        <span>Slide 4 of 6</span>
+      </div>
+    </div>
+
+    <!-- Slide 5: Latent Semantic Analysis (LSA) Deep Dive -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2>Latent Semantic Analysis (LSA) Deep Dive</h2>
+        <span class="slide-tag">Natural Language Processing</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="content-box">
+            <h3>💡 Why TF-IDF + SVD?</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">
+              Python 3.14 on Windows has compatibility issues with PyTorch and ONNX runtimes.
+            </p>
+            <ul>
+              <li>LSA (TF-IDF combined with Truncated SVD) has <strong>zero heavy native DLL dependencies</strong> and runs flawlessly on Python 3.14.</li>
+              <li>Builds a dense **384-dimensional** semantic space of candidates.</li>
+              <li>Understands synonym relationships (e.g., matching "vector search" to "FAISS" or "semantic search").</li>
+            </ul>
+          </div>
+          <div class="content-box" style="display: flex; flex-direction: column; justify-content: center;">
+            <div style="font-family: monospace; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; font-size: 0.8rem; border: 1px solid var(--border);">
+              <span style="color: var(--accent);"># Dense cosine similarity math</span><br>
+              candidate_embeddings = np.load('candidate_embeddings.npy')<br>
+              jd_vector = tfidf.transform([jd_text])<br>
+              jd_embedding = svd.transform(jd_vector)<br>
+              similarities = cosine_similarity(jd_embedding, candidate_embeddings)
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 15px; text-align: center;">
+              Computes semantic similarity for all 100K profiles in just **0.06 seconds** once precomputed.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Team Blue Samurai — AI Candidate Ranker</span>
+        <span>Slide 5 of 6</span>
+      </div>
+    </div>
+
+    <!-- Slide 6: Results, Dashboard & Performance -->
+    <div class="slide">
+      <div class="slide-header">
+        <h2>Results & Dashboard</h2>
+        <span class="slide-tag">Performance</span>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="content-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h3>📈 Engine Execution Metrics</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+                Our ranking engine compiles candidate ranks and builds full natural language reasoning in seconds.
+              </p>
+            </div>
+            <div class="metrics-group" style="grid-template-columns: 1fr 1fr;">
+              <div class="metric-card" style="padding: 12px;">
+                <div class="num" style="font-size: 1.8rem; color: var(--primary);">1.8m</div>
+                <div class="label" style="font-size: 0.75rem;">Pre-computation</div>
+              </div>
+              <div class="metric-card" style="padding: 12px;">
+                <div class="num" style="font-size: 1.8rem; color: var(--accent);">5.1s</div>
+                <div class="label" style="font-size: 0.75rem;">Rank Processing</div>
+              </div>
+            </div>
+          </div>
+          <div class="content-box">
+            <h3>🖥️ Interactive Recruiter Dashboard</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+              A fully offline Web Dashboard (`dashboard/index.html`) has been provided to explore the output.
+            </p>
+            <ul>
+              <li>Interactive search bar & category filters (Notice Period, Location, Open to Work).</li>
+              <li>Breakdown modal showing raw semantic, structural, and behavioral scores.</li>
+              <li>Natural language recruiter reasoning explanations generated for all top 100 candidates.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Team Blue Samurai — AI Candidate Ranker</span>
+        <span>Slide 6 of 6</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Simple keyboard navigation for presentation
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        scrollToSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        scrollToSlide(currentSlide - 1);
+      }
+    });
+
+    function scrollToSlide(index) {
+      if (index >= 0 && index < slides.length) {
+        currentSlide = index;
+        slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  </script>
+</body>
+</html>
