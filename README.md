@@ -84,6 +84,19 @@ python India_runs_data_and_ai_challenge/validate_submission.py submission.csv
 python embed.py && python rank.py --candidates ./India_runs_data_and_ai_challenge/candidates.jsonl --out ./submission.csv
 ```
 
+### 🖥️ Running the Web Dashboard & Presentation
+
+A premium interactive dashboard and presentation deck are included as bonus UI assets.
+
+To run locally:
+```bash
+# Start a local HTTP server from the project root
+python -m http.server 8000 --directory dashboard
+```
+
+1. **Dashboard:** Open [http://localhost:8000](http://localhost:8000) in your browser. Load the sample data or upload `submission.csv` to explore the candidates, statistics, and individual score breakdowns.
+2. **Presentation Deck:** Open [http://localhost:8000/presentation.html](http://localhost:8000/presentation.html) in your browser to view the interactive presentation detailing our approach. Press `Ctrl + P` to save the slides directly to PDF.
+
 ## 🧠 Approach — How It Works
 
 ### The Core Insight
@@ -177,10 +190,11 @@ redrob/
 │   ├── candidate_ids.json       # Candidate ID -> index mapping
 │   ├── tfidf_vectorizer.joblib  # Fitted TF-IDF vectorizer
 │   └── svd_model.joblib         # Fitted TruncatedSVD model
-├── dashboard/                   # Interactive web dashboard (bonus)
-│   ├── index.html
-│   ├── styles.css
-│   └── app.js
+├── dashboard/                   # Interactive web dashboard & presentation deck
+│   ├── index.html               # Main dashboard UI
+│   ├── styles.css               # Editorial CSS styles
+│   ├── app.js                   # Client-side data loading & interactive logic
+│   └── presentation.html        # Interactive presentation slides (Track 1 Deck)
 └── India_runs_data_and_ai_challenge/  # Dataset (not in repo)
     ├── candidates.jsonl
     ├── job_description.docx
