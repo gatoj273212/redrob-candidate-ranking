@@ -1,0 +1,84 @@
+# Redrob Hackathon — Submission Metadata
+#
+# Fill in your team details before submitting.
+
+# ============================================================================
+# Team identity
+# ============================================================================
+team_name: "YOUR-TEAM-NAME"  # TODO: Fill in your team name
+
+primary_contact:
+  name: "YOUR NAME"           # TODO: Fill in your name
+  email: "your@email.com"     # TODO: Fill in your email
+  phone: "+91-XXXXXXXXXX"     # TODO: Fill in your phone
+
+team_members:
+  - name: "YOUR NAME"         # TODO: Fill in
+    email: "your@email.com"
+    role: "ML Engineer"
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/YOUR_USERNAME/redrob"  # TODO: Update with your repo URL
+
+sandbox_link: ""  # TODO: Add if you deploy a sandbox
+
+reproduce_command: "python embed.py && python rank.py --candidates ./India_runs_data_and_ai_challenge/candidates.jsonl --out ./submission.csv"
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Windows Desktop — Intel i7-11700F"
+  cpu_cores: 8
+  ram_gb: 16
+  python_version: "3.14"
+  os: "Windows"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: true
+  pre_computation_time_minutes: 2
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+ai_tools_used:
+  - "Gemini (Antigravity IDE)"
+
+ai_usage_summary: |
+  Used Gemini via Antigravity IDE for architecture discussion, code generation,
+  and debugging. No candidate data was fed to any external LLM API during ranking.
+  All scoring and ranking runs entirely offline on CPU with no network access.
+
+# ============================================================================
+# Approach summary
+# ============================================================================
+methodology_summary: |
+  Hybrid multi-signal ranker combining semantic and structural analysis.
+
+  Phase 1 (Pre-computation): TF-IDF vectorization (30K features, unigrams+bigrams)
+  followed by TruncatedSVD (384 dimensions) for latent semantic embeddings of all
+  100K candidates. Runs in ~2 minutes on CPU.
+
+  Phase 2 (Ranking, <5 min): Three-tier scoring:
+  1) Semantic (40%): Cosine similarity between JD and candidate SVD embeddings
+  2) Structural (40%): Rule-based scoring of title fit, experience band (6-8yr
+     ideal), skill match (duration-weighted), career evidence (production keywords),
+     location, and education
+  3) Behavioral (20%): Redrob platform signals — recency, response rate,
+     open-to-work, notice period, GitHub activity, profile completeness
+
+  Honeypot detection penalizes impossible profiles. Disqualifier penalties for
+  consulting-only careers, pure research, and non-technical backgrounds.
+  Runtime: ~5 seconds for ranking phase.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true

@@ -1,0 +1,31 @@
+# Hackathon Dataset (Too large for GitHub)
+India_runs_data_and_ai_challenge/
+
+# Precomputed embeddings and models (Too large for GitHub, regenerable via embed.py)
+precomputed/
+
+# Old unused model artifacts
+model_onnx/
+
+# Python caching & environments
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+.venv/
+env/
+venv/
+
+# Node.js dependencies
+node_modules/
+package-lock.json
+
+# IDE settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
