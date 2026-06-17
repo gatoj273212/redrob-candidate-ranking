@@ -5,22 +5,17 @@
 # ============================================================================
 # Team identity
 # ============================================================================
-team_name: "YOUR-TEAM-NAME"  # TODO: Fill in your team name
+team_name: "blue samurai"  # TODO: Fill in your team name
 
 primary_contact:
-  name: "YOUR NAME"           # TODO: Fill in your name
-  email: "your@email.com"     # TODO: Fill in your email
-  phone: "+91-XXXXXXXXXX"     # TODO: Fill in your phone
-
-team_members:
-  - name: "YOUR NAME"         # TODO: Fill in
-    email: "your@email.com"
-    role: "ML Engineer"
+  name: "vanam gatoj kumar"           # TODO: Fill in your name
+  email: "gatojkumar@gmail.com"     # TODO: Fill in your email
+  phone: "+91-9121403489"     # TODO: Fill in your phone
 
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
-github_repo: "https://github.com/YOUR_USERNAME/redrob"  # TODO: Update with your repo URL
+github_repo: "https://github.com/gatoj273212/redrob-candidate-ranking.git"  # TODO: Update with your repo URL
 
 sandbox_link: ""  # TODO: Add if you deploy a sandbox
 
